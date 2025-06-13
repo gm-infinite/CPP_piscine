@@ -1,6 +1,6 @@
-CPP_FILES = main.cpp  Zombie.cpp zombieHorde.cpp
+CPP_FILES = main.cpp Weapon.cpp HumanA.cpp HumanB.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = zombieHorde
+NAME = unnecessaryViolence
 all: $(NAME)
 
 $(NAME):
@@ -17,5 +17,4 @@ re: fclean all
 main: re
 	clear
 	
-
 .PHONY = all clean fclean re

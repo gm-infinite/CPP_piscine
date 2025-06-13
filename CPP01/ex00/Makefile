@@ -7,6 +7,7 @@ $(NAME):
 	c++ $(FLAGS) $(CPP_FILES) -o $(NAME)
 
 clean:
+	rm $(NAME)
 
 fclean:
 	rm $(NAME)
