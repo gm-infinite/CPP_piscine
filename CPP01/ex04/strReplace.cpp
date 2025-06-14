@@ -3,7 +3,7 @@
 
 static std::string readfile(std::string filename)
 {
-    std::ifstream file(filename, std::ios::binary); 
+    std::ifstream file(filename.c_str(), std::ios::binary); 
 
     if (!file.is_open())                              
         return "";
