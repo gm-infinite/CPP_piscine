@@ -75,5 +75,5 @@ bool Point::isonrightside(const Point& a, const Point& b, const Point& point)
     Point ab(b.getX() - a.getX(), b.getY() - a.getY());
     Point ap(point.getX() - a.getX(), point.getY() - a.getY());
 
-    return (Point::dotProduct(ap, Point::Perpendicular(ab)) > Fixed());
+    return (Point::dotProduct(ap, Point::Perpendicular(ab)) >= Fixed());
 }

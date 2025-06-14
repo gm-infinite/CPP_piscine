@@ -1,6 +1,6 @@
 CPP_FILES = main.cpp Fixed.cpp Point.cpp bsd.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = fixedtest
+NAME = bsp
 all: $(NAME)
 
 $(NAME):
