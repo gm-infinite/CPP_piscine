@@ -3,20 +3,19 @@
 
 static std::string readfile(std::string filename)
 {
-	std::ifstream file(filename.c_str());
-	std::string line;
-	std::string file_str;
+    std::ifstream file(filename, std::ios::binary); 
 
-	if (!file.is_open())
-		return file_str;
-	for (int counter = 0; std::getline(file, line); counter++) 
-	{
-		if (counter != 0)
-			file_str += "\n";
-		file_str += line;
-	}
+    if (!file.is_open())                              
+        return "";
 
-	return file_str;
+    file.seekg(0, std::ios::end);                   
+    std::streampos fileSize = file.tellg();         
+    file.seekg(0, std::ios::beg);                   
+
+    std::string fileData(fileSize, '\0');            
+    file.read(&fileData[0], fileSize);               
+
+    return fileData;                                  
 }
 
 void strreplace(std::string filename, std::string s1, std::string s2)
