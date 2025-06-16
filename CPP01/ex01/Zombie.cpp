@@ -20,8 +20,7 @@ Zombie::Zombie (std::string name)
 
 Zombie::~Zombie()
 {
-	std::cout 	<< this->name
-				<< ": called deconstructor (got destroyed)"
+	std::cout 	<< this->name << ": called deconstructor (got destroyed)"
 				<< std::endl;
 }
 
