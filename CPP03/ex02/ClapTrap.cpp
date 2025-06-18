@@ -82,7 +82,7 @@ void ClapTrap::Attack(const std::string& Target)
 	else
 	{
 		std::cout << "ClapTrap " << name << " attacks " << Target << ", causing " << this->GetAttackdamage() << " points of damage" << '\n'
-				  << "ClapTrap " << name << " used an enegy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
+				  << "ClapTrap " << name << " used an energy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
 		this->SetEnergypoints(energypoints - 1);
 	}
 }
@@ -118,7 +118,7 @@ void ClapTrap::beRepaired(unsigned int amount)
 	{
 		hitpoints += amount;
 		std::cout << name << " repaired itself by " << amount << ", it now has " << hitpoints << " Hit points" << '\n'
-				  << name << " used an enegy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
+				  << name << " used an energy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
 		this->SetHitpoints(hitpoints);
 		this->SetEnergypoints(energypoints - 1);
 	}

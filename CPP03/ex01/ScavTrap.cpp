@@ -11,7 +11,7 @@ ClapTrap("Default", 100, 50, 20)
 }
 
 ScavTrap::ScavTrap(const ScavTrap& other) : 
-ClapTrap(other.GetName(), 100, 50, 20)
+ClapTrap(other.GetName(), other.GetHitpoints(), other.GetEnergypoints(), other.GetAttackdamage())
 {
 	std::cout << "ScavTrap Copy constructor called" << std::endl;
 }
@@ -60,7 +60,7 @@ void ScavTrap::Attack(const std::string& Target)
 	else
 	{
 		std::cout << "ScavTrap " << name << " attacks " << Target << ", causing " << this->GetAttackdamage() << " points of damage" << '\n'
-				  << "ScavTrap " << name << " used an enegy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
+				  << "ScavTrap " << name << " used an energy point and has " << energypoints - 1 << " energy points left to use" << std::endl;
 		this->SetEnergypoints(energypoints - 1);
 	}
 }
@@ -69,7 +69,7 @@ void ScavTrap::Attack(const std::string& Target)
 void ScavTrap::GuardGate(void) const
 {
 	if (this->GetHitpoints() < 1)
-		std::cout << "ClapTrap " << this->GetName() << " can't do anything because it has no Hit points" << std::endl;
+		std::cout << "ScavTrap " << this->GetName() << " can't do anything because it has no Hit points" << std::endl;
 	else
-		std::cout << "ScapTrap " << this->GetName() << " is now on gate keeper mode" << std::endl;
+		std::cout << "ScavTrap " << this->GetName() << " is now on gate keeper mode" << std::endl;
 }
