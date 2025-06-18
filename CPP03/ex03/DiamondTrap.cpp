@@ -6,6 +6,8 @@
 /* └──────────────────┘ */
 DiamondTrap::DiamondTrap(void) :
 ClapTrap(),
+FragTrap(),
+ScavTrap(),
 Name("Default")
 {
 	this->SetName("Default_clap_name");
@@ -17,6 +19,8 @@ Name("Default")
 
 DiamondTrap::DiamondTrap(const std::string& Name) : 
 ClapTrap(),
+FragTrap(),
+ScavTrap(),
 Name(Name)
 {
 	this->ClapTrap::SetName(Name + "_clap_name");
