@@ -4,31 +4,21 @@
 /* ┌──────────────────┐ */
 /* │   COSNTRUCTORS   │ */
 /* └──────────────────┘ */
-ScavTrap::ScavTrap(void)
+ScavTrap::ScavTrap(void) :
+ClapTrap()
 {
-	this->SetName("Default");
-	this->SetHitpoints(this->default_hitpoints);
-	this->SetEnergypoints(this->default_energypoints);
-	this->SetAttackdamage(this->default_attackdamage);
 	std::cout << "ScavTrap Default constructor called" << std::endl;
 }
 
 ScavTrap::ScavTrap(const ScavTrap& other) :
-	ClapTrap(other)
+ClapTrap(other)
 {
-	this->SetName(other.GetName());
-	this->SetHitpoints(other.GetHitpoints());
-	this->SetEnergypoints(other.GetEnergypoints());
-	this->SetAttackdamage(other.GetAttackdamage());
 	std::cout << "ScavTrap Copy constructor called" << std::endl;
 }
 
-ScavTrap::ScavTrap(const std::string& Name)
+ScavTrap::ScavTrap(const std::string& Name) :
+ClapTrap(Name)
 {
-	this->SetName(Name);
-	this->SetHitpoints(this->default_hitpoints);
-	this->SetEnergypoints(this->default_energypoints);
-	this->SetAttackdamage(this->default_attackdamage);
 	std::cout << "ScavTrap String input constructor called" << std::endl;
 }
 

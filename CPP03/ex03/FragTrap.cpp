@@ -4,31 +4,21 @@
 /* ┌──────────────────┐ */
 /* │   COSNTRUCTORS   │ */
 /* └──────────────────┘ */
-FragTrap::FragTrap(void)
+FragTrap::FragTrap(void) :
+ClapTrap()
 {
-	this->SetName("Default");
-	this->SetHitpoints(this->default_hitpoints);
-	this->SetEnergypoints(this->default_energypoints);
-	this->SetAttackdamage(this->default_attackdamage);
 	std::cout << "FragTrap Default constructor called" << std::endl;
 }
 
 FragTrap::FragTrap(const FragTrap& other) : 
 ClapTrap(other)
 {
-	this->SetName(other.GetName());
-	this->SetHitpoints(other.GetHitpoints());
-	this->SetEnergypoints(other.GetEnergypoints());
-	this->SetAttackdamage(other.GetAttackdamage());
 	std::cout << "FragTrap Copy constructor called" << std::endl;
 }
 
-FragTrap::FragTrap(const std::string& Name)
+FragTrap::FragTrap(const std::string& Name) :
+ClapTrap(Name)
 {
-	this->SetName(Name);
-	this->SetHitpoints(this->default_hitpoints);
-	this->SetEnergypoints(this->default_energypoints);
-	this->SetAttackdamage(this->default_attackdamage);
 	std::cout << "FragTrap String input constructor called" << std::endl;
 }
 

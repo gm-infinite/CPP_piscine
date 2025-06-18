@@ -11,7 +11,7 @@ ClapTrap("Default", 100, 100, 30)
 }
 
 FragTrap::FragTrap(const FragTrap& other) : 
-ClapTrap(other.GetName(), other.GetHitpoints(), other.GetEnergypoints(), other.GetAttackdamage())
+ClapTrap(other)
 {
 	std::cout << "FragTrap Copy constructor called" << std::endl;
 }

@@ -11,7 +11,7 @@ ClapTrap("Default", 100, 50, 20)
 }
 
 ScavTrap::ScavTrap(const ScavTrap& other) : 
-ClapTrap(other.GetName(), other.GetHitpoints(), other.GetEnergypoints(), other.GetAttackdamage())
+ClapTrap(other)
 {
 	std::cout << "ScavTrap Copy constructor called" << std::endl;
 }
