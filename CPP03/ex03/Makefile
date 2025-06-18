@@ -1,6 +1,6 @@
-CPP_FILES = main.cpp ClapTrap.cpp ScavTrap.cpp FragTrap.cpp
+CPP_FILES = main.cpp ClapTrap.cpp ScavTrap.cpp FragTrap.cpp DiamondTrap.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = fragtraptest
+NAME = diamondtraptest
 all: $(NAME)
 
 $(NAME):
