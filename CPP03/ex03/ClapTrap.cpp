@@ -163,3 +163,4 @@ void ClapTrap::SetAttackdamage(const int Attack_damage)
 {
 	this->Attack_damage = Attack_damage;
 }
+

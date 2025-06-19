@@ -1,5 +1,4 @@
 #include "DiamondTrap.hpp"
-#include <iostream>
 
 void printDiamondTrapStats(const DiamondTrap& dt, const std::string& label) {
     std::cout << "---- " << label << " ----\n";

@@ -29,7 +29,7 @@ public:
 	void beRepaired(unsigned int amount);
 	
 
-private:
+protected:
 	std::string Name;
 	int Hit_points;
 	int Energy_points;

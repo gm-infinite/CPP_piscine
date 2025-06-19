@@ -1,5 +1,14 @@
 #include "ScavTrap.hpp"
 
+void printTrapStats(const ScavTrap& dt, const std::string& label) {
+    std::cout << "---- " << label << " ----\n";
+    std::cout << "ScavTrap Name: " << dt.GetName() << '\n';
+    std::cout << "Hitpoints: " << dt.GetHitpoints() << '\n';
+    std::cout << "Energypoints: " << dt.GetEnergypoints() << '\n';
+    std::cout << "Attackdamage: " << dt.GetAttackdamage() << '\n';
+    std::cout << "--------------------------\n\n";
+}
+
 int main ()
 {
         std::cout << "\n##### ScavTrap tests #####\n";
@@ -8,6 +17,26 @@ int main ()
         ScavTrap kuzyilma("kuzyilma");
         ScavTrap copy_kuzyilma(kuzyilma);
         ScavTrap test("test");
+
+
+        std::cout << "Name:" << kuzyilma.GetName()
+                  << "hitpoints:" << kuzyilma.GetHitpoints()
+                  << ", energypoints:" << kuzyilma.GetEnergypoints()
+                  << ", attackdamage:" << kuzyilma.GetAttackdamage() << std::endl;
+
+        std::cout << "\n---- copy constructor test -----\n";
+        printTrapStats(kuzyilma, "Original (kuzyilma)");
+        printTrapStats(copy_kuzyilma, "Copy (copy_kuzyilma)");
+
+        bool exactCopy =
+            (copy_kuzyilma.GetName() == kuzyilma.GetName()) &&
+            (copy_kuzyilma.ClapTrap::GetName() == kuzyilma.ClapTrap::GetName()) &&
+            (copy_kuzyilma.GetHitpoints() == kuzyilma.GetHitpoints()) &&
+            (copy_kuzyilma.GetEnergypoints() == kuzyilma.GetEnergypoints()) &&
+            (copy_kuzyilma.GetAttackdamage() == kuzyilma.GetAttackdamage());
+
+        std::cout << (exactCopy ? "Copy constructor test PASSED\n" : "Copy constructor test FAILED\n");
+
 
 	    std::cout << "\n---- berepaired and assignment(operator=) function test-----\n";
 
