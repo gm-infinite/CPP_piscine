@@ -1,4 +1,4 @@
-CPP_FILES = main.cpp Cat.cpp Animal.cpp Dog.cpp WrongAnimal.cpp WrongCat.cpp
+CPP_FILES = main.cpp Cat.cpp Animal.cpp Dog.cpp WrongAnimal.cpp WrongCat.cpp Brain.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
 NAME = animaltest
 all: $(NAME)

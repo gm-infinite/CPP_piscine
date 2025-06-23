@@ -34,10 +34,14 @@ Cat::~Cat(void)
 
 Cat& Cat::operator=(const Cat& other)
 {
-	this->setType(other.getType());
-	*this->brain = *other.brain;
-	std::cout << "CAt assignment operator is called" << std::endl;
-	return *this;
+	if (this != &other) 
+	{
+        this->setType(other.getType());
+        delete this->brain;
+        this->brain = new Brain(*other.brain);
+        std::cout << "Cat assignment operator is called" << std::endl;
+    }
+    return *this;
 }
 
 /* ┌──────────────────────┐ */
@@ -47,4 +51,14 @@ Cat& Cat::operator=(const Cat& other)
 void Cat::makeSound(void) const
 {
 	std::cout << "Meow" << std::endl;
+}
+
+const Brain* Cat::getBrain(void) const
+{
+	return this->brain;
+}
+
+void Cat::setBrainIdea(int i, const std::string& idea)
+{
+	this->brain->setIdea(i, idea);
 }

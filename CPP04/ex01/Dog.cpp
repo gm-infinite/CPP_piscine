@@ -48,3 +48,13 @@ void Dog::makeSound(void) const
 {
 	std::cout << "woof" << std::endl;
 }
+
+const Brain* Dog::getBrain(void) const
+{
+	return this->brain;
+}
+
+void Dog::setBrainIdea(int i, const std::string& idea)
+{
+	this->brain->setIdea(i, idea);
+}
