@@ -1,6 +1,6 @@
-CPP_FILES = main.cpp strReplace.cpp
+CPP_FILES = main.cpp 
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = strreplace
+NAME = animaltest
 all: $(NAME)
 
 $(NAME):
@@ -17,4 +17,5 @@ re: fclean all
 main: re
 	clear
 	
+
 .PHONY = all clean fclean re

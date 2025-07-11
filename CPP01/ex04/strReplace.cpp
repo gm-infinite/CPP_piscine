@@ -1,32 +1,21 @@
 
 #include "strReplace.hpp"
 
-static std::string readfile(std::string filename)
-{
-    std::ifstream file(filename.c_str(), std::ios::binary); 
-
-    if (!file.is_open())                              
-        return "";
-
-    file.seekg(0, std::ios::end);                   
-    std::streampos fileSize = file.tellg();         
-    file.seekg(0, std::ios::beg);                   
-
-    std::string fileData(fileSize, '\0');            
-    file.read(&fileData[0], fileSize);               
-
-    return fileData;                                  
-}
-
 void strreplace(std::string filename, std::string s1, std::string s2)
 {
 	std::string replaced;
+	std::ifstream file(filename.c_str()); 
 	int s1_length = s1.length();
 	int s2_length = s2.length();
 
 	if (filename == "" || s1_length < 1)
 		return ;
-	replaced = readfile(filename);
+
+	std::ostringstream buffer;
+    buffer << file.rdbuf();
+    replaced = buffer.str();
+    file.close();
+
 	if (replaced.length() > 0)
 	{
 		size_t found_pos = replaced.find(s1, 0);
