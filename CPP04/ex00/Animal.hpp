@@ -26,3 +26,4 @@ protected:
 };
 
 #endif /* ANIMAL_HPP */
+

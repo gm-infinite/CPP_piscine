@@ -36,11 +36,7 @@ void add_function(PhoneBook *phonebook)
 	std::cout << "Please enter the darkest secret of the new contact:" << std::endl;
 	std::getline(std::cin, new_contact.dark_secret);
 
-	phonebook->all_contects[contact_amounth%8].first_name = new_contact.first_name; 
-	phonebook->all_contects[contact_amounth%8].last_name = new_contact.last_name; 
-	phonebook->all_contects[contact_amounth%8].nickname = new_contact.nickname; 
-	phonebook->all_contects[contact_amounth%8].phone_number = new_contact.phone_number; 
-	phonebook->all_contects[contact_amounth%8].dark_secret = new_contact.dark_secret;
+	phonebook->all_contects[contact_amounth%8] = new_contact;
 
 	contact_amounth++;
 }
@@ -72,7 +68,7 @@ void search_function(PhoneBook phonebook)
 	while (!(index.size() < 2 && (index.at(0) >= '0' && index.at(0) <= '7')))
 	{
 		for (int i = 0; i < 8; i++)
-		print_search_table(i, phonebook.all_contects[i]);
+			print_search_table(i, phonebook.all_contects[i]);
 		std::cout << "which indexes information do you want to see?" << std::endl;
 		std::getline(std::cin, index);
 		if (!(index.size() < 2 && (index.at(0) >= '0' && index.at(0) <= '7')))

@@ -18,3 +18,4 @@ private:
 };
 
 #endif /* WRONGCAT_HPP */
+

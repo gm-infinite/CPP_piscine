@@ -10,6 +10,12 @@ void strreplace(std::string filename, std::string s1, std::string s2)
 
 	if (filename == "" || s1_length < 1)
 		return ;
+	
+	if (!file.is_open())
+	{
+		std::cerr << "Error: Could not open file '" << filename << "'" << std::endl;
+		return ;
+	}
 
 	std::ostringstream buffer;
     buffer << file.rdbuf();
@@ -30,4 +36,9 @@ void strreplace(std::string filename, std::string s1, std::string s2)
 	std::ofstream file_replaced((filename + ".replace").c_str());
 	if (file_replaced.is_open())
 		file_replaced << replaced;
+	else
+	{
+		std::cerr << "Error: Could not create output file '" << filename << ".replace'" << std::endl;
+		return ;
+	}
 }

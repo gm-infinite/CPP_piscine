@@ -1,4 +1,4 @@
-#pragma once
+
 #ifndef WEAPON_HPP
 #define WEAPON_HPP
 #include <string>
@@ -19,6 +19,4 @@ private:
 
 };
 
-
-
-#endif /* WEAPON_HPP */
+#endif

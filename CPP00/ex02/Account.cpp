@@ -130,6 +130,6 @@ int	Account::_totalNbWithdrawals = 0;
     	struct tm* localTime = localtime(&now);  
 
     	char buffer[19];  
-    	strftime(buffer, sizeof(buffer), "[%Y%m%d_%H%M%S] ", localTime);
+    	std::strftime(buffer, sizeof(buffer), "[%Y%m%d_%H%M%S] ", localTime);
 		std::cout << buffer;
 	}
