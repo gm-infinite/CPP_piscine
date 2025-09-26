@@ -7,16 +7,16 @@ int main(int ac, char** av)
 	{
 		std::string level_str(av[1]);
 		int level = 100;
+		std::string levels[4] = {"DEBUG", "INFO", "WARNING", "ERROR"};
 		Harl harl;
-		if (level_str == "DEBUG")
-			level = 0;
-		else if (level_str == "INFO")
-			level = 1;
-		else if (level_str == "WARNING")
-			level = 2;
-		else if (level_str == "ERROR")
-			level = 3;
-
+		for(int i = 0; i < 4; i++)
+		{
+			if (level_str == levels[i])
+			{
+				level = i;
+				break;
+			}
+		}
 		switch (level)
 		{
 		case (0):
