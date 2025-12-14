@@ -32,7 +32,7 @@ Fixed::~Fixed(void)
 Fixed& Fixed::operator=(const Fixed& other)
 {
 	if (this != &other)
-		this->FPNumberValue = other.getRawBits();
+		this->setRawBits(other.getRawBits());
 	return *this;
 }
 
