@@ -20,7 +20,7 @@ int main ()
 
 
         std::cout << "Name:" << kuzyilma.GetName()
-                  << "hitpoints:" << kuzyilma.GetHitpoints()
+                  << ", hitpoints:" << kuzyilma.GetHitpoints()
                   << ", energypoints:" << kuzyilma.GetEnergypoints()
                   << ", attackdamage:" << kuzyilma.GetAttackdamage() << std::endl;
 
