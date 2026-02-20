@@ -46,11 +46,14 @@ ClapTrap::~ClapTrap(void)
 
 ClapTrap& ClapTrap::operator=(const ClapTrap& other)
 {
-	this->SetName(other.GetName());
-	this->SetHitpoints(other.GetHitpoints());
-	this->SetEnergypoints(other.GetEnergypoints());
-	this->SetAttackdamage(other.GetAttackdamage());
-	return *this;
+    if (this != &other)
+    {
+        this->SetName(other.GetName());
+        this->SetHitpoints(other.GetHitpoints());
+        this->SetEnergypoints(other.GetEnergypoints());
+        this->SetAttackdamage(other.GetAttackdamage());
+    }
+    return *this;
 }
 
 /* ┌──────────────────────┐ */

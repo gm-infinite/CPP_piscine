@@ -48,7 +48,10 @@ DiamondTrap& DiamondTrap::operator=(const DiamondTrap& other)
 {
 	std::cout << "DiamondTrap copy assignment (operator=) is called" << std::endl;
 	if (this != &other)
+	{
 		ClapTrap::operator=(other);
+		this->Name = other.Name;
+	}
 	return *this;
 }
 
