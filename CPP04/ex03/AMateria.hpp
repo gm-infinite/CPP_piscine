@@ -1,23 +1,27 @@
 
-
 #ifndef AMATERIA_HPP
 #define AMATERIA_HPP
-#include <string>
+
+#include "IMateriaSource.hpp"
 
 class ICharacter;
 
 class AMateria
 {
 protected:
-	std::string type;
+    std::string type;                    // "ice" or "cure"
 
 public:
-AMateria(std::string const & type);
-virtual ~AMateria(void);
-std::string const & getType() const; //Returns the materia type
-virtual AMateria* clone() const = 0;
-virtual void use(ICharacter& target);
+    AMateria();
+    AMateria(std::string const & type);
+    AMateria(const AMateria& other);
+    AMateria& operator=(const AMateria& other);
+    virtual ~AMateria();
 
+    std::string const & getType() const; // Returns the type (NOT virtual)
+    
+    virtual AMateria* clone() const = 0;                    // PURE VIRTUAL
+    virtual void use(ICharacter& target);                   // VIRTUAL (has default)
 };
 
 #endif /* AMATERIA_HPP */

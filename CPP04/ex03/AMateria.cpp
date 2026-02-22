@@ -1,10 +1,18 @@
 
+
+
 #include "AMateria.hpp"
 
 /* ┌──────────────────┐ */
 /* │   COSNTRUCTORS   │ */
 /* └──────────────────┘ */
-AMateria::AMateria(const std::string& type) : type(type)
+AMateria::AMateria(void) : type("default")
+{ }
+
+AMateria::AMateria(std::string const &type) : type(type)
+{ }
+
+AMateria::AMateria(const AMateria& other) : type(other.getType())
 { }
 
 /* ┌───────────────────┐ */
@@ -17,6 +25,14 @@ AMateria::~AMateria(void)
 /* ┌───────────────┐ */
 /* │   OVERLOADS   │ */
 /* └───────────────┘ */
+
+AMateria& AMateria::operator=(const AMateria& other)
+{
+	
+	if (this != &other)
+		this->type = other.getType();
+	return *this;
+}
 
 /* ┌──────────────────────┐ */
 /* │   MEMBER FUNCTIONS   │ */
