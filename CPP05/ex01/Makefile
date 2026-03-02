@@ -1,4 +1,4 @@
-CPP_FILES = main.cpp Bureaucrat.cpp
+CPP_FILES = main.cpp Bureaucrat.cpp Form.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
 NAME = test
 all: $(NAME)

@@ -5,6 +5,8 @@
 #include <iostream>
 #include <exception>
 
+class Form;
+
 class Bureaucrat {
 
 public:
@@ -20,18 +22,19 @@ public:
 
     void incrementGrade(void);
     void decrementGrade(void);
+    void signForm(Form& f) const;
 
 	class GradeTooHighException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too high (minimum is 1)";
+            return "Bureaucrat: Grade is too high (minimum is 1)";
         }
     };
     
     class GradeTooLowException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too low (maximum is 150)";
+            return "Bureaucrat: Grade is too low (maximum is 150)";
         }
     };
 

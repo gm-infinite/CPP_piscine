@@ -1,5 +1,6 @@
 
 #include "Bureaucrat.hpp"
+#include "Form.hpp"
 
 /* ┌──────────────────┐ */
 /* │   COSNTRUCTORS   │ */
@@ -41,19 +42,29 @@ Bureaucrat& Bureaucrat::operator=(const Bureaucrat& other)
 /* │   MEMBER FUNCTIONS   │ */
 /* └──────────────────────┘ */
 
-	void Bureaucrat::incrementGrade()
-	{
-		if (grade - 1 < 1)
-			throw GradeTooHighException();
-		this->grade--;
+void Bureaucrat::signForm(Form& f) const
+{
+	try {
+	f.beSigned(*this);
 	}
+	catch (std::exception& e) {
+		std::cout << e.what() << '\n' << " ^^ the bureaucrat catched an error from form::Besigned() in signForm()" << std::endl;
+	}
+}
 
-    void Bureaucrat::decrementGrade()
-	{
-		if (grade + 1 > 150)
-			throw GradeTooLowException();
-		this->grade++;
-	}
+void Bureaucrat::incrementGrade()
+{
+	if (grade - 1 < 1)
+		throw GradeTooHighException();
+	this->grade--;
+}
+
+void Bureaucrat::decrementGrade()
+{
+	if (grade + 1 > 150)
+		throw GradeTooLowException();
+	this->grade++;
+}
 
 std::string Bureaucrat::getName(void) const {
 	return this->Name;

@@ -4,12 +4,14 @@
 
 #include <string>
 
+class Bureaucrat;
+
 class Form {
 
 public:
 	Form(void);
 	~Form(void);
-	Form(const std::string& Name, const bool IsSigned, const int SignGrade, const int ExecuteGrade);
+	Form(const std::string& name, int SignGrade, int ExecuteGrade);
 	Form(const Form& other);
 	Form& operator=(const Form& other);
 
@@ -18,17 +20,19 @@ public:
 	int getSignGrade(void) const;
 	int getExecuteGrade(void) const;
 
+	void beSigned(const Bureaucrat& b);
+
 	class GradeTooHighException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too high (minimum is 1)";
+            return "Form: Grade is too high (minimum is 1)";
         }
     };
     
     class GradeTooLowException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too low (maximum is 150)";
+            return "Form: Grade is too low (maximum is 150)";
         }
     };
 
@@ -39,5 +43,7 @@ private:
 	const int ExecuteGrade;
 
 };
+
+std::ostream& operator<<(std::ostream& os, const Form& form);
 
 #endif /* FORM_HPP */
