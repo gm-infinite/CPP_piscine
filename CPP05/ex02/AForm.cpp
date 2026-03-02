@@ -1,48 +1,48 @@
 
-#include "Form.hpp"
+#include "AForm.hpp"
 #include "Bureaucrat.hpp"
 
 /* ┌──────────────────┐ */
 /* │   COSNTRUCTORS   │ */
 /* └──────────────────┘ */
-Form::Form(void) : 
+AForm::AForm(void) : 
 Name("default"), 
 IsSigned(false), 
 SignGrade(1), 
 ExecuteGrade(1)
 { }
 
-Form::Form(const Form& other) :
+AForm::AForm(const AForm& other) :
 Name(other.Name), 
 IsSigned(other.IsSigned), 
 SignGrade(other.SignGrade), 
 ExecuteGrade(other.ExecuteGrade)
 { }
 
-Form::Form(const std::string& name, int SignGrade, int ExecuteGrade): 
+AForm::AForm(const std::string& name, int SignGrade, int ExecuteGrade): 
 Name(name),
 IsSigned(false),
 SignGrade(SignGrade),
 ExecuteGrade(ExecuteGrade)
 {
     if (SignGrade < 1 || ExecuteGrade < 1)
-        throw Form::GradeTooHighException();
+        throw AForm::GradeTooHighException();
     if (SignGrade > 150 || ExecuteGrade > 150)
-        throw Form::GradeTooLowException();
+        throw AForm::GradeTooLowException();
 }
 
 /* ┌───────────────────┐ */
 /* │   DECOSNTRUCTOR   │ */
 /* └───────────────────┘ */
 
-Form::~Form(void)
+AForm::~AForm(void)
 { }
 
 /* ┌───────────────┐ */
 /* │   OVERLOADS   │ */
 /* └───────────────┘ */
 
-Form& Form::operator=(const Form& other)
+AForm& AForm::operator=(const AForm& other)
 {
 	if (this != &other)
 		this->IsSigned = other.IsSigned;
@@ -53,33 +53,39 @@ Form& Form::operator=(const Form& other)
 /* │   MEMBER FUNCTIONS   │ */
 /* └──────────────────────┘ */
 
-void Form::beSigned(const Bureaucrat& b)
+void AForm::beSigned(const Bureaucrat& b)
 {
-    if (this->IsSigned)
-    	throw std::runtime_error("Form is already signed");
-	if (!(b.getGrade() <= this->SignGrade))
-		throw Form::GradeTooLowException();
+    if (this->IsSigned) {
+        throw std::runtime_error("Form is already signed");
+	}
+	if (!(b.getGrade() <= this->SignGrade)) {
+		throw AForm::GradeTooLowException();
+	}
 	std::cout << "the form has been signed" << std::endl;
 	this->IsSigned = true;
 }
 
-std::string Form::getName(void) const {
+std::string AForm::getName(void) const {
 	return this->Name;
 }
 
-bool Form::getIsSigned(void) const {
+bool AForm::getIsSigned(void) const {
 	return this->IsSigned;
 }
 
-int Form::getSignGrade(void) const {
+int AForm::getSignGrade(void) const {
 	return this->SignGrade;
 }
 
-int Form::getExecuteGrade(void) const {
+int AForm::getExecuteGrade(void) const {
 	return this->ExecuteGrade;
 }
 
-std::ostream& operator<<(std::ostream& os, const Form& f)
+void AForm::setIsSigned(const bool a) {
+	this->IsSigned = a;
+}
+
+std::ostream& operator<<(std::ostream& os, const AForm& f)
 {
 	os << "Form: " << f.getName() << '\n'
        << "Signed: " << (f.getIsSigned() ? "yes" : "no") << '\n'

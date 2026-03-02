@@ -28,8 +28,7 @@ int createGrade(int grade) {
 
 int main() {
     int g = createGrade(0);
-    if (g == -1)
-        std::cout << "Error!";  // Easy to forget this check!
+    // Easy to forget to check the return value!
 }
 ```
 
@@ -37,18 +36,19 @@ int main() {
 ```cpp
 int createGrade(int grade) {
     if (grade < 1)
-        throw GradeTooHighException();  // Execution STOPS here
+        throw Bureaucrat::GradeTooHighException();
     if (grade > 150)
-        throw GradeTooLowException();
+        throw Bureaucrat::GradeTooLowException();
     return grade;
 }
 
 int main() {
     try {
-        int g = createGrade(0);  // Exception thrown!
-        // This line NEVER executes
-    } catch (std::exception& e) {
-        std::cout << "Error: " << e.what();  // Handles the error
+        int g = createGrade(0);  // This will throw
+        std::cout << g;          // Never reached
+    }
+    catch (std::exception& e) {
+        std::cout << e.what();   // Handles the error
     }
 }
 ```
@@ -65,18 +65,19 @@ int main() {
 ```cpp
 void validateGrade(int grade) {
     if (grade < 1)
-        throw std::out_of_range("Grade too high!");  // THROWS exception
-    // Code below this NEVER runs if exception is thrown
+        throw Bureaucrat::GradeTooHighException();
+    if (grade > 150)
+        throw Bureaucrat::GradeTooLowException();
     std::cout << "Grade is valid";
 }
 ```
 
 **You can throw anything:**
 ```cpp
-throw 42;                    // An integer
-throw "Error message";       // A C-string
-throw std::string("Error");  // A std::string
-throw MyException();         // A custom exception object (RECOMMENDED)
+throw 42;                                    // An integer
+throw "Error message";                       // A C-string
+throw std::string("Error");                  // A std::string
+throw Bureaucrat::GradeTooHighException();   // A custom exception object (RECOMMENDED)
 ```
 
 ---
@@ -88,8 +89,8 @@ A `try` block wraps code that **might throw** an exception:
 ```cpp
 try {
     // Code that might fail goes here
-    riskyFunction();
-    anotherRiskyFunction();
+    Bureaucrat bob("Bob", 0);  // This throws!
+    std::cout << bob;          // Never reached
 }
 ```
 
@@ -105,8 +106,8 @@ A `catch` block handles exceptions thrown from the `try` block:
 
 ```cpp
 try {
-    riskyFunction();
-} catch (ExceptionType& e) {
+    Bureaucrat bob("Bob", 0);
+} catch (std::exception& e) {
     // Handle the exception
     std::cout << "Error: " << e.what() << std::endl;
 }
@@ -115,12 +116,12 @@ try {
 **Multiple catch blocks** (from most specific to most general):
 ```cpp
 try {
-    riskyFunction();
+    Bureaucrat bob("Bob", 0);
 }
-catch (GradeTooHighException& e) {
+catch (Bureaucrat::GradeTooHighException& e) {
     std::cout << "Grade too high!";
 }
-catch (GradeTooLowException& e) {
+catch (Bureaucrat::GradeTooLowException& e) {
     std::cout << "Grade too low!";
 }
 catch (std::exception& e) {
@@ -164,7 +165,7 @@ public:
 class GradeTooHighException : public std::exception {
 public:
     const char* what() const throw() {
-        return "Grade is too high!";
+        return "Grade is too high (minimum is 1)";
     }
 };
 ```
@@ -176,18 +177,18 @@ The subject requires exceptions as **nested classes** inside Bureaucrat:
 ```cpp
 class Bureaucrat {
 public:
-    // Nested exception class
+    // Nested exception classes
     class GradeTooHighException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too high (minimum is 1)!";
+            return "Grade is too high (minimum is 1)";
         }
     };
     
     class GradeTooLowException : public std::exception {
     public:
         const char* what() const throw() {
-            return "Grade is too low (maximum is 150)!";
+            return "Grade is too low (maximum is 150)";
         }
     };
     
@@ -229,7 +230,7 @@ Create a `Bureaucrat` class that throws exceptions for invalid grades.
 
 | Attribute | Description |
 |-----------|-------------|
-| `name` | `const std::string`, set at construction, never changes |
+| `Name` | `const std::string`, set at construction, never changes |
 | `grade` | `int` from 1 (highest) to 150 (lowest) |
 
 | Exception | When thrown |
@@ -241,6 +242,7 @@ Create a `Bureaucrat` class that throws exceptions for invalid grades.
 |--------|-------------|
 | `getName()` | Returns the name |
 | `getGrade()` | Returns the grade |
+| `setGrade()` | Sets the grade (with validation) |
 | `incrementGrade()` | Decreases grade by 1 (grade 3 → grade 2) |
 | `decrementGrade()` | Increases grade by 1 (grade 3 → grade 4) |
 
@@ -254,86 +256,132 @@ Create a `Bureaucrat` class that throws exceptions for invalid grades.
 #define BUREAUCRAT_HPP
 
 #include <string>
-#include <exception>
 #include <iostream>
+#include <exception>
 
 class Bureaucrat {
+
 public:
     // Orthodox Canonical Form
     Bureaucrat(void);
-    Bureaucrat(const std::string& name, int grade);  // Parameterized constructor
+    ~Bureaucrat(void);
+    Bureaucrat(const std::string& name, int grade);
     Bureaucrat(const Bureaucrat& other);
     Bureaucrat& operator=(const Bureaucrat& other);
-    ~Bureaucrat(void);
 
-    // Getters
-    const std::string& getName(void) const;
+    // Getters & Setters
+    std::string getName(void) const;
     int getGrade(void) const;
+    void setGrade(const int grade);
 
-    // Grade modifiers (can throw!)
-    void incrementGrade(void);  // Makes grade better (lower number)
-    void decrementGrade(void);  // Makes grade worse (higher number)
+    // Grade modifiers
+    void incrementGrade(void);
+    void decrementGrade(void);
 
     // Nested exception classes
     class GradeTooHighException : public std::exception {
     public:
-        const char* what() const throw();
+        const char* what() const throw() {
+            return "Grade is too high (minimum is 1)";
+        }
     };
-
+    
     class GradeTooLowException : public std::exception {
     public:
-        const char* what() const throw();
+        const char* what() const throw() {
+            return "Grade is too low (maximum is 150)";
+        }
     };
 
 private:
-    const std::string _name;
-    int _grade;
+    const std::string Name;
+    int grade;
 };
 
 // Overload for << operator (outside class)
-std::ostream& operator<<(std::ostream& os, const Bureaucrat& b);
+std::ostream& operator<<(std::ostream& os, const Bureaucrat& obj);
 
-#endif
+#endif /* BUREAUCRAT_HPP */
 ```
 
 **Key implementation points in Bureaucrat.cpp:**
 
 ```cpp
+/* ┌──────────────────┐ */
+/* │   CONSTRUCTORS   │ */
+/* └──────────────────┘ */
+Bureaucrat::Bureaucrat(void) : Name("random_employe"), grade(150)
+{ }
+
+Bureaucrat::Bureaucrat(const Bureaucrat& other) : Name(other.Name), grade(other.grade)
+{ }
+
 // Constructor with grade validation
-Bureaucrat::Bureaucrat(const std::string& name, int grade) : _name(name) {
+Bureaucrat::Bureaucrat(const std::string& name, int grade) : Name(name)
+{
     if (grade < 1)
         throw GradeTooHighException();
-    if (grade > 150)
+    else if (grade > 150)
         throw GradeTooLowException();
-    _grade = grade;
+    this->grade = grade;
 }
 
+/* ┌───────────────────┐ */
+/* │   DESTRUCTOR     │ */
+/* └───────────────────┘ */
+Bureaucrat::~Bureaucrat(void)
+{ }
+
+/* ┌───────────────┐ */
+/* │   OVERLOADS   │ */
+/* └───────────────┘ */
+Bureaucrat& Bureaucrat::operator=(const Bureaucrat& other)
+{
+    if (this != &other)
+        this->grade = other.grade;
+    return *this;
+}
+
+/* ┌──────────────────────┐ */
+/* │   MEMBER FUNCTIONS   │ */
+/* └──────────────────────┘ */
+
 // Increment (grade gets BETTER = number gets smaller)
-void Bureaucrat::incrementGrade(void) {
-    if (_grade <= 1)
+void Bureaucrat::incrementGrade(void)
+{
+    if (grade - 1 < 1)
         throw GradeTooHighException();
-    _grade--;
+    this->grade--;
 }
 
 // Decrement (grade gets WORSE = number gets bigger)
-void Bureaucrat::decrementGrade(void) {
-    if (_grade >= 150)
+void Bureaucrat::decrementGrade(void)
+{
+    if (grade + 1 > 150)
         throw GradeTooLowException();
-    _grade++;
+    this->grade++;
 }
 
-// Exception what() implementations
-const char* Bureaucrat::GradeTooHighException::what() const throw() {
-    return "Grade is too high!";
+std::string Bureaucrat::getName(void) const {
+    return this->Name;
 }
 
-const char* Bureaucrat::GradeTooLowException::what() const throw() {
-    return "Grade is too low!";
+int Bureaucrat::getGrade(void) const {
+    return this->grade;
+}
+
+void Bureaucrat::setGrade(const int grade) {
+    if (grade < 1)
+        throw GradeTooHighException();
+    else if (grade > 150)
+        throw GradeTooLowException();
+    this->grade = grade;
 }
 
 // << operator overload
-std::ostream& operator<<(std::ostream& os, const Bureaucrat& b) {
-    os << b.getName() << ", bureaucrat grade " << b.getGrade();
+std::ostream& operator<<(std::ostream& os, const Bureaucrat& obj) 
+{
+    os << obj.getName() << ", bureaucrat grade " << obj.getGrade() << ".";  
     return os;
 }
 ```
@@ -343,48 +391,64 @@ std::ostream& operator<<(std::ostream& os, const Bureaucrat& b) {
 ```cpp
 #include "Bureaucrat.hpp"
 
-int main() {
-    // TEST 1: Create valid Bureaucrat
+int main()
+{
+    std::cout << "--- Test 1: Valid bureaucrat ---" << std::endl;
     try {
         Bureaucrat bob("Bob", 50);
-        std::cout << bob << std::endl;  // "Bob, bureaucrat grade 50"
+        std::cout << bob << std::endl;
     }
     catch (std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
-    // TEST 2: Grade too high (0 is invalid)
+    std::cout << "\n--- Test 2: Grade too high (0) ---" << std::endl;
     try {
-        Bureaucrat alice("Alice", 0);  // Throws GradeTooHighException!
+        Bureaucrat alice("Alice", 0);
     }
     catch (std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
-    // TEST 3: Grade too low (151 is invalid)
+    std::cout << "\n--- Test 3: Grade too low (151) ---" << std::endl;
     try {
-        Bureaucrat charlie("Charlie", 151);  // Throws GradeTooLowException!
+        Bureaucrat charlie("Charlie", 151);
     }
     catch (std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
-    // TEST 4: Increment past limit
+    std::cout << "\n--- Test 4: Increment at grade 1 ---" << std::endl;
     try {
-        Bureaucrat dave("Dave", 1);  // Highest grade
-        dave.incrementGrade();       // Throws! Can't go higher than 1
+        Bureaucrat dave("Dave", 1);
+        std::cout << dave << std::endl;
+        dave.incrementGrade();
     }
     catch (std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
-    // TEST 5: Decrement past limit
+    std::cout << "\n--- Test 5: Decrement at grade 150 ---" << std::endl;
     try {
-        Bureaucrat eve("Eve", 150);  // Lowest grade
-        eve.decrementGrade();        // Throws! Can't go lower than 150
+        Bureaucrat eve("Eve", 150);
+        std::cout << eve << std::endl;
+        eve.decrementGrade();
     }
     catch (std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << "\n--- Test 6: Normal increment/decrement ---" << std::endl;
+    try {
+        Bureaucrat frank("Frank", 75);
+        std::cout << frank << std::endl;
+        frank.incrementGrade();
+        std::cout << frank << std::endl;
+        frank.decrementGrade();
+        std::cout << frank << std::endl;
+    }
+    catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
 
     return 0;
@@ -410,10 +474,10 @@ In ex00, exceptions were self-contained in Bureaucrat. Now you'll learn:
 **Form Class Attributes (all private):**
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `name` | `const std::string` | Name of the form |
-| `isSigned` | `bool` | False at construction |
-| `gradeToSign` | `const int` | Min grade needed to sign (1-150) |
-| `gradeToExecute` | `const int` | Min grade needed to execute (1-150) |
+| `Name` | `const std::string` | Name of the form |
+| `IsSigned` | `bool` | False at construction |
+| `SignGrade` | `const int` | Min grade needed to sign (1-150) |
+| `ExecuteGrade` | `const int` | Min grade needed to execute (1-150) |
 
 **Form Exceptions:**
 | Exception | When thrown |
@@ -426,9 +490,9 @@ In ex00, exceptions were self-contained in Bureaucrat. Now you'll learn:
 |--------|-------------|
 | `getName()` | Returns form name |
 | `getIsSigned()` | Returns signed status |
-| `getGradeToSign()` | Returns required grade to sign |
-| `getGradeToExecute()` | Returns required grade to execute |
-| `beSigned(Bureaucrat& b)` | Signs form if bureaucrat's grade is high enough |
+| `getSignGrade()` | Returns required grade to sign |
+| `getExecuteGrade()` | Returns required grade to execute |
+| `beSigned(const Bureaucrat& b)` | Signs form if bureaucrat's grade is high enough |
 
 **New Bureaucrat Method:**
 | Method | Description |
@@ -440,20 +504,15 @@ In ex00, exceptions were self-contained in Bureaucrat. Now you'll learn:
 ```
 Bureaucrat::signForm(Form& f)
     │
-    └─► try {
-            f.beSigned(*this);  ← Calls Form's method
-            │
-            └─► Form::beSigned(Bureaucrat& b)
-                    │
-                    └─► if (b.getGrade() > gradeToSign)
-                            throw GradeTooLowException();  ← Form THROWS
-                        │
-                        │ Exception travels back
-                        │
-                        ▼
-        } catch (std::exception& e) {  ← Bureaucrat CATCHES
-            // Print failure message
-        }
+    ├── calls f.beSigned(*this)
+    │       │
+    │       └── Form checks grade
+    │               │
+    │               ├── OK → IsSigned = true
+    │               │
+    │               └── FAIL → throw GradeTooLowException
+    │
+    └── catches exception, prints error message
 ```
 
 ### Implementation Guide
@@ -464,77 +523,143 @@ Bureaucrat::signForm(Form& f)
 #define FORM_HPP
 
 #include <string>
-#include <exception>
-#include <iostream>
 
 class Bureaucrat;  // Forward declaration (avoids circular include)
 
 class Form {
+
 public:
     // Orthodox Canonical Form
     Form(void);
-    Form(const std::string& name, int gradeToSign, int gradeToExecute);
+    ~Form(void);
+    Form(const std::string& name, int SignGrade, int ExecuteGrade);
     Form(const Form& other);
     Form& operator=(const Form& other);
-    ~Form(void);
 
     // Getters
-    const std::string& getName(void) const;
+    std::string getName(void) const;
     bool getIsSigned(void) const;
-    int getGradeToSign(void) const;
-    int getGradeToExecute(void) const;
+    int getSignGrade(void) const;
+    int getExecuteGrade(void) const;
 
-    // Sign the form
+    // Sign method
     void beSigned(const Bureaucrat& b);
 
-    // Nested exceptions
+    // Nested exception classes
     class GradeTooHighException : public std::exception {
     public:
-        const char* what() const throw();
+        const char* what() const throw() {
+            return "Form: Grade is too high (minimum is 1)";
+        }
     };
-
+    
     class GradeTooLowException : public std::exception {
     public:
-        const char* what() const throw();
+        const char* what() const throw() {
+            return "Form: Grade is too low (maximum is 150)";
+        }
     };
 
 private:
-    const std::string _name;
-    bool _isSigned;
-    const int _gradeToSign;
-    const int _gradeToExecute;
+    const std::string Name;
+    bool IsSigned;
+    const int SignGrade;
+    const int ExecuteGrade;
 };
 
-std::ostream& operator<<(std::ostream& os, const Form& f);
+std::ostream& operator<<(std::ostream& os, const Form& form);
 
-#endif
+#endif /* FORM_HPP */
 ```
 
 **Key Form.cpp implementation:**
 ```cpp
+#include "Form.hpp"
+#include "Bureaucrat.hpp"
+
+/* ┌──────────────────┐ */
+/* │   CONSTRUCTORS   │ */
+/* └──────────────────┘ */
+Form::Form(void) : 
+Name("default"), 
+IsSigned(false), 
+SignGrade(1), 
+ExecuteGrade(1)
+{ }
+
+Form::Form(const Form& other) :
+Name(other.Name), 
+IsSigned(other.IsSigned), 
+SignGrade(other.SignGrade), 
+ExecuteGrade(other.ExecuteGrade)
+{ }
+
 // Constructor validates grades
-Form::Form(const std::string& name, int gradeToSign, int gradeToExecute)
-    : _name(name), _isSigned(false), _gradeToSign(gradeToSign), _gradeToExecute(gradeToExecute)
+Form::Form(const std::string& name, int SignGrade, int ExecuteGrade): 
+Name(name),
+IsSigned(false),
+SignGrade(SignGrade),
+ExecuteGrade(ExecuteGrade)
 {
-    if (gradeToSign < 1 || gradeToExecute < 1)
-        throw GradeTooHighException();
-    if (gradeToSign > 150 || gradeToExecute > 150)
-        throw GradeTooLowException();
+    if (SignGrade < 1 || ExecuteGrade < 1)
+        throw Form::GradeTooHighException();
+    if (SignGrade > 150 || ExecuteGrade > 150)
+        throw Form::GradeTooLowException();
 }
 
+/* ┌───────────────────┐ */
+/* │   DESTRUCTOR     │ */
+/* └───────────────────┘ */
+Form::~Form(void)
+{ }
+
+/* ┌───────────────┐ */
+/* │   OVERLOADS   │ */
+/* └───────────────┘ */
+Form& Form::operator=(const Form& other)
+{
+    if (this != &other)
+        this->IsSigned = other.IsSigned;
+    return *this;
+}
+
+/* ┌──────────────────────┐ */
+/* │   MEMBER FUNCTIONS   │ */
+/* └──────────────────────┘ */
+
 // beSigned - called by Bureaucrat::signForm()
-void Form::beSigned(const Bureaucrat& b) {
-    if (b.getGrade() > _gradeToSign)  // Remember: lower number = higher grade
-        throw GradeTooLowException();
-    _isSigned = true;
+void Form::beSigned(const Bureaucrat& b)
+{
+    if (this->IsSigned)
+        throw std::runtime_error("Form is already signed");
+    if (!(b.getGrade() <= this->SignGrade))  // Remember: lower number = higher grade
+        throw Form::GradeTooLowException();
+    std::cout << "the form has been signed" << std::endl;
+    this->IsSigned = true;
+}
+
+std::string Form::getName(void) const {
+    return this->Name;
+}
+
+bool Form::getIsSigned(void) const {
+    return this->IsSigned;
+}
+
+int Form::getSignGrade(void) const {
+    return this->SignGrade;
+}
+
+int Form::getExecuteGrade(void) const {
+    return this->ExecuteGrade;
 }
 
 // << operator
-std::ostream& operator<<(std::ostream& os, const Form& f) {
-    os << "Form: " << f.getName()
-       << ", Signed: " << (f.getIsSigned() ? "yes" : "no")
-       << ", Grade to sign: " << f.getGradeToSign()
-       << ", Grade to execute: " << f.getGradeToExecute();
+std::ostream& operator<<(std::ostream& os, const Form& form) {
+    os << "Form: " << form.getName() << '\n'
+       << "Signed: " << (form.getIsSigned() ? "yes" : "no") << '\n'
+       << "Grade to sign: " << form.getSignGrade() << '\n'
+       << "Grade to execute: " << form.getExecuteGrade() << std::endl;
     return os;
 }
 ```
@@ -544,21 +669,22 @@ std::ostream& operator<<(std::ostream& os, const Form& f) {
 class Form;  // Forward declaration at top
 
 // Add this method declaration
-void signForm(Form& f);
+void signForm(Form& f) const;
 ```
 
 **Add to Bureaucrat.cpp:**
 ```cpp
 #include "Form.hpp"  // Need full definition now
 
-void Bureaucrat::signForm(Form& f) {
+void Bureaucrat::signForm(Form& f) const
+{
     try {
         f.beSigned(*this);
-        std::cout << _name << " signed " << f.getName() << std::endl;
     }
     catch (std::exception& e) {
-        std::cout << _name << " couldn't sign " << f.getName()
-                  << " because " << e.what() << std::endl;
+        std::cout << e.what() << '\n' 
+                  << " ^^ the bureaucrat catched an error from form::beSigned() in signForm()" 
+                  << std::endl;
     }
 }
 ```
@@ -595,8 +721,9 @@ class Form {
 #include "Bureaucrat.hpp"
 #include "Form.hpp"
 
-int main() {
-    // Test 1: Create valid form
+int main()
+{
+    std::cout << "--- Test 1: Create valid Form ---" << std::endl;
     try {
         Form taxForm("Tax Form", 50, 25);
         std::cout << taxForm << std::endl;
@@ -605,30 +732,55 @@ int main() {
         std::cout << e.what() << std::endl;
     }
 
-    // Test 2: Form with invalid grade
+    std::cout << "\n--- Test 2: Form grade too high (0) ---" << std::endl;
     try {
-        Form badForm("Bad Form", 0, 25);  // Throws GradeTooHighException
+        Form badForm("Bad Form", 0, 25);
     }
     catch (std::exception& e) {
         std::cout << e.what() << std::endl;
     }
 
-    // Test 3: Bureaucrat signs form successfully
+    std::cout << "\n--- Test 3: Form grade too low (151) ---" << std::endl;
+    try {
+        Form badForm("Bad Form", 151, 25);
+    }
+    catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << "\n--- Test 4: Bureaucrat signs Form successfully ---" << std::endl;
     try {
         Bureaucrat boss("Boss", 10);
         Form easyForm("Easy Form", 50, 25);
-        boss.signForm(easyForm);  // Should succeed (10 <= 50)
+        std::cout << boss << std::endl;
+        std::cout << easyForm << std::endl;
+        boss.signForm(easyForm);
         std::cout << easyForm << std::endl;
     }
     catch (std::exception& e) {
         std::cout << e.what() << std::endl;
     }
 
-    // Test 4: Bureaucrat fails to sign (grade too low)
+    std::cout << "\n--- Test 5: Bureaucrat fails to sign (grade too low) ---" << std::endl;
     try {
         Bureaucrat intern("Intern", 100);
         Form hardForm("Hard Form", 10, 5);
-        intern.signForm(hardForm);  // Should fail (100 > 10)
+        std::cout << intern << std::endl;
+        std::cout << hardForm << std::endl;
+        intern.signForm(hardForm);
+    }
+    catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << "\n--- Test 6: Bureaucrat at exact grade limit ---" << std::endl;
+    try {
+        Bureaucrat exactGrade("ExactGrade", 50);
+        Form exactForm("Exact Form", 50, 25);
+        std::cout << exactGrade << std::endl;
+        std::cout << exactForm << std::endl;
+        exactGrade.signForm(exactForm);
+        std::cout << exactForm << std::endl;
     }
     catch (std::exception& e) {
         std::cout << e.what() << std::endl;
@@ -638,153 +790,763 @@ int main() {
 }
 ```
 
-### Expected Output
-```
-Form: Tax Form, Signed: no, Grade to sign: 50, Grade to execute: 25
-Grade is too high!
-Boss signed Easy Form
-Form: Easy Form, Signed: yes, Grade to sign: 50, Grade to execute: 25
-Intern couldn't sign Hard Form because Grade is too low!
-```
-
 ---
 
-## Common Mistakes to Avoid
+## Exercise 02: No, you need form 28B, not 28C...
 
-### 1. Catching by Value (Creates a Copy)
+### Goal
+Transform `Form` into an **abstract base class** (`AForm`) and create concrete form classes that actually do something when executed. Learn about **abstract classes**, **pure virtual functions**, and **polymorphism** with exceptions.
+
+### New Concepts: Abstract Classes & Pure Virtual Functions
+
+**What is an Abstract Class?**
+An abstract class is a class that:
+- Cannot be instantiated directly
+- Contains at least one **pure virtual function**
+- Serves as a base class for derived classes
+
+**Pure Virtual Function:**
+A function declared with `= 0` - it has no implementation in the base class and MUST be overridden by derived classes.
+
 ```cpp
-// BAD - catches a copy, can cause slicing
-catch (std::exception e) { }
+class AForm {
+public:
+    // Pure virtual function - makes AForm abstract
+    virtual void execute(Bureaucrat const & executor) const = 0;
+};
 
-// GOOD - catches by reference
-catch (std::exception& e) { }
+// This will NOT compile:
+AForm form;  // ERROR! Cannot instantiate abstract class
+
+// This WILL compile:
+ShrubberyCreationForm form("home");  // OK! Concrete class
 ```
 
-### 2. Catching General Before Specific
-```cpp
-// BAD - specific catch is never reached
-catch (std::exception& e) { }
-catch (GradeTooHighException& e) { }  // NEVER reached!
+**Why use Abstract Classes?**
+- Defines a common interface that all derived classes must follow
+- Ensures derived classes implement required functionality
+- Allows polymorphism - use base class pointers/references to work with any derived class
 
-// GOOD - specific first
-catch (GradeTooHighException& e) { }
-catch (std::exception& e) { }
+### Requirements
+
+**Files to Submit:**
+- `Makefile`
+- `main.cpp`
+- `Bureaucrat.hpp`, `Bureaucrat.cpp`
+- `AForm.hpp`, `AForm.cpp`
+- `ShrubberyCreationForm.hpp`, `ShrubberyCreationForm.cpp`
+- `RobotomyRequestForm.hpp`, `RobotomyRequestForm.cpp`
+- `PresidentialPardonForm.hpp`, `PresidentialPardonForm.cpp`
+
+### Changes to Form → AForm
+
+**Rename Form to AForm and make it abstract:**
+| Change | Description |
+|--------|-------------|
+| Rename class | `Form` → `AForm` |
+| Add `execute()` | Pure virtual function to execute the form's action |
+| Add `setIsSigned()` | Setter for derived classes |
+| Keep attributes private | All attributes stay in base class |
+
+**AForm Attributes (all private, inherited from ex01):**
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `Name` | `const std::string` | Name of the form |
+| `IsSigned` | `bool` | False at construction |
+| `SignGrade` | `const int` | Min grade needed to sign (1-150) |
+| `ExecuteGrade` | `const int` | Min grade needed to execute (1-150) |
+
+**New AForm Methods:**
+| Method | Description |
+|--------|-------------|
+| `execute(Bureaucrat const & executor) const` | Pure virtual - executes the form's action |
+| `setIsSigned(const bool a)` | Setter for IsSigned (used in derived class copy) |
+
+**New AForm Exception:**
+| Exception | When thrown |
+|-----------|-------------|
+| `AForm::FormNotSignedException` | When attempting to execute an unsigned form |
+
+### Concrete Form Classes
+
+All concrete forms inherit from `AForm` and take only ONE parameter: **Target** (std::string).
+
+| Form Class | Grade to Sign | Grade to Execute | Action |
+|------------|---------------|------------------|--------|
+| `ShrubberyCreationForm` | 145 | 137 | Creates file `<Target>_shrubbery` with ASCII trees |
+| `RobotomyRequestForm` | 72 | 45 | 50% chance: "<Target> has been robotomized" or "robotomy failed" |
+| `PresidentialPardonForm` | 25 | 5 | "<Target> has been pardoned by Zaphod Beeblebrox" |
+
+### New Bureaucrat Method
+
+| Method | Description |
+|--------|-------------|
+| `executeForm(AForm const & form) const` | Attempts to execute form, prints success/error message |
+
+### Implementation Guide
+
+**AForm.hpp:**
+```cpp
+#ifndef AFORM_HPP
+#define AFORM_HPP
+
+#include <string>
+#include <iostream>
+
+class Bureaucrat;
+
+class AForm {
+
+public:
+    // Orthodox Canonical Form
+    AForm(void);
+    ~AForm(void);
+    AForm(const std::string& name, int SignGrade, int ExecuteGrade);
+    AForm(const AForm& other);
+    AForm& operator=(const AForm& other);
+
+    // Getters & Setters
+    std::string getName(void) const;
+    bool getIsSigned(void) const;
+    int getSignGrade(void) const;
+    int getExecuteGrade(void) const;
+    void setIsSigned(const bool a);
+
+    // Sign and Execute
+    void beSigned(const Bureaucrat& b);
+    virtual void execute(const Bureaucrat& executor) const = 0;  // Pure virtual
+
+    // Nested exception classes
+    class GradeTooHighException : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "AForm: Grade is too high (minimum is 1)";
+        }
+    };
+    
+    class GradeTooLowException : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "AForm: Grade is too low (maximum is 150)";
+        }
+    };
+
+    class FormNotSignedException : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "AForm: Form is not signed!";
+        }
+    };
+
+private:
+    const std::string Name;
+    bool IsSigned;
+    const int SignGrade;
+    const int ExecuteGrade;
+};
+
+std::ostream& operator<<(std::ostream& os, const AForm& form);
+
+#endif /* AFORM_HPP */
 ```
 
-### 3. Forgetting to Include `<exception>`
+**ShrubberyCreationForm.hpp:**
 ```cpp
-#include <exception>  // Required for std::exception
+#ifndef SHRUBBERYCREATIONFORM_HPP
+#define SHRUBBERYCREATIONFORM_HPP
+
+#include "AForm.hpp"
+
+class ShrubberyCreationForm : public AForm {
+
+public:
+    ShrubberyCreationForm(void);
+    ~ShrubberyCreationForm(void);
+    ShrubberyCreationForm(const std::string Target);
+    ShrubberyCreationForm(const ShrubberyCreationForm& other);
+    ShrubberyCreationForm& operator=(const ShrubberyCreationForm& other);
+
+    std::string getTarget(void) const;
+
+    void execute(Bureaucrat const& executor) const;
+
+private:
+    std::string Target;
+};
+
+std::ostream& operator<<(std::ostream& os, const ShrubberyCreationForm& form);
+
+#endif /* SHRUBBERYCREATIONFORM_HPP */
 ```
 
-### 4. Not Using `const throw()` in what()
+**ShrubberyCreationForm.cpp:**
 ```cpp
-// BAD - might not compile or might have undefined behavior
-const char* what() { return "Error"; }
+#include "ShrubberyCreationForm.hpp"
+#include "Bureaucrat.hpp"
+#include <fstream>
 
-// GOOD - matches std::exception's signature
-const char* what() const throw() { return "Error"; }
+/* ┌──────────────────┐ */
+/* │   CONSTRUCTORS   │ */
+/* └──────────────────┘ */
+ShrubberyCreationForm::ShrubberyCreationForm(void):
+AForm("Shrubbery_Creation_Form", 145, 137),
+Target("default")
+{ }
+
+ShrubberyCreationForm::ShrubberyCreationForm(const std::string Target) :
+AForm("Shrubbery_Creation_Form", 145, 137),
+Target(Target)
+{ }
+
+ShrubberyCreationForm::ShrubberyCreationForm(const ShrubberyCreationForm& other) :
+AForm(other),
+Target(other.Target)
+{ }
+
+/* ┌───────────────────┐ */
+/* │   DESTRUCTOR     │ */
+/* └───────────────────┘ */
+ShrubberyCreationForm::~ShrubberyCreationForm(void)
+{ }
+
+/* ┌───────────────┐ */
+/* │   OVERLOADS   │ */
+/* └───────────────┘ */
+ShrubberyCreationForm& ShrubberyCreationForm::operator=(const ShrubberyCreationForm& other)
+{
+    if (this != &other) {
+        this->setIsSigned(other.getIsSigned());
+        this->Target = other.Target;
+    }
+    return *this;
+}
+
+/* ┌──────────────────────┐ */
+/* │   MEMBER FUNCTIONS   │ */
+/* └──────────────────────┘ */
+void ShrubberyCreationForm::execute(const Bureaucrat& b) const
+{
+    if (!this->getIsSigned())
+        throw FormNotSignedException();
+    if (this->getExecuteGrade() < b.getGrade())
+        throw GradeTooLowException();
+    
+    std::ofstream file((this->Target + "_shrubbery").c_str());
+    if (!file.is_open())
+        throw std::runtime_error("Could not create file");
+    
+    file << "       _-_" << std::endl;
+    file << "    /~~   ~~\\" << std::endl;
+    file << " /~~         ~~\\" << std::endl;
+    file << "{               }" << std::endl;
+    file << " \\  _-     -_  /" << std::endl;
+    file << "   ~  \\\\ //  ~" << std::endl;
+    file << "_- -   | | _- _" << std::endl;
+    file << "  _ -  | |   -_" << std::endl;
+    file << "      // \\\\" << std::endl;
+
+    file.close();
+}
+
+std::string ShrubberyCreationForm::getTarget(void) const {
+    return this->Target;
+}
+
+std::ostream& operator<<(std::ostream& os, const ShrubberyCreationForm& f)
+{
+    os << "Form: " << f.getName() << '\n'
+       << "Signed: " << (f.getIsSigned() ? "yes" : "no") << '\n'
+       << "Grade to sign: " << f.getSignGrade() << '\n'
+       << "Grade to execute: " << f.getExecuteGrade() << '\n'
+       << "Target: " << f.getTarget() << std::endl;
+    return os;
+}
 ```
 
-### 5. Throwing in Destructor
+**RobotomyRequestForm execute:**
 ```cpp
-// VERY BAD - can cause undefined behavior!
-~Bureaucrat() {
-    throw SomeException();  // NEVER DO THIS
+void RobotomyRequestForm::execute(const Bureaucrat& b) const
+{
+    if (!this->getIsSigned())
+        throw FormNotSignedException();
+    if (this->getExecuteGrade() < b.getGrade())
+        throw GradeTooLowException();
+    
+    std::cout << "* DRILLING NOISES * Bzzzz... Vrrrr..." << std::endl;
+    
+    if (std::rand() % 2 == 0)
+        std::cout << this->Target << " has been robotomized successfully!" << std::endl;
+    else
+        std::cout << "Robotomy failed on " << this->Target << "!" << std::endl;
+}
+```
+
+**PresidentialPardonForm execute:**
+```cpp
+void PresidentialPardonForm::execute(const Bureaucrat& b) const
+{
+    if (!this->getIsSigned())
+        throw FormNotSignedException();
+    if (this->getExecuteGrade() < b.getGrade())
+        throw GradeTooLowException();
+    
+    std::cout << this->Target << " has been pardoned by Zaphod Beeblebrox." << std::endl;
+}
+```
+
+**Add to Bureaucrat (ex02):**
+```cpp
+// In Bureaucrat.hpp
+class AForm;  // Forward declaration
+
+void signForm(AForm& f) const;
+void executeForm(AForm const & form) const;
+
+// In Bureaucrat.cpp
+void Bureaucrat::signForm(AForm& f) const
+{
+    try {
+        f.beSigned(*this);
+    }
+    catch (std::exception& e) {
+        std::cout << e.what() << '\n' 
+                  << " ^^ the bureaucrat catched an error from form::beSigned() in signForm()" 
+                  << std::endl;
+    }
+}
+
+void Bureaucrat::executeForm(const AForm& form) const
+{
+    try {
+        form.execute(*this);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what() << '\n' 
+                  << " ^^ the bureaucrat catched an error from AForm::execute() in executeForm()" 
+                  << std::endl;
+    }
+}
+```
+
+### Testing Example (main.cpp)
+
+```cpp
+#include "Bureaucrat.hpp"
+#include "ShrubberyCreationForm.hpp"
+#include "RobotomyRequestForm.hpp"
+#include "PresidentialPardonForm.hpp"
+#include <cstdlib>
+#include <ctime>
+
+int main()
+{
+    std::srand(std::time(0));
+
+    std::cout << "=== Test 1: ShrubberyCreationForm - Execute Success ===" << std::endl;
+    try {
+        Bureaucrat bob("Bob", 1);
+        ShrubberyCreationForm shrub("home");
+        std::cout << shrub << std::endl;
+        bob.signForm(shrub);
+        bob.executeForm(shrub);
+        std::cout << "Check for 'home_shrubbery' file!" << std::endl;
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 2: Execute unsigned form ===" << std::endl;
+    try {
+        Bureaucrat alice("Alice", 1);
+        ShrubberyCreationForm shrub("garden");
+        alice.executeForm(shrub);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 3: Execute with grade too low ===" << std::endl;
+    try {
+        Bureaucrat intern("Intern", 140);
+        Bureaucrat boss("Boss", 1);
+        ShrubberyCreationForm shrub("office");
+        boss.signForm(shrub);
+        intern.executeForm(shrub);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 4: RobotomyRequestForm - 50% success ===" << std::endl;
+    try {
+        Bureaucrat scientist("Scientist", 1);
+        RobotomyRequestForm robot("Bender");
+        std::cout << robot << std::endl;
+        scientist.signForm(robot);
+        std::cout << "Attempt 1:" << std::endl;
+        scientist.executeForm(robot);
+        std::cout << "Attempt 2:" << std::endl;
+        scientist.executeForm(robot);
+        std::cout << "Attempt 3:" << std::endl;
+        scientist.executeForm(robot);
+        std::cout << "Attempt 4:" << std::endl;
+        scientist.executeForm(robot);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 5: PresidentialPardonForm ===" << std::endl;
+    try {
+        Bureaucrat president("President", 1);
+        PresidentialPardonForm pardon("Arthur Dent");
+        std::cout << pardon << std::endl;
+        president.signForm(pardon);
+        president.executeForm(pardon);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 6: PresidentialPardonForm - grade too low to sign ===" << std::endl;
+    try {
+        Bureaucrat clerk("Clerk", 100);
+        PresidentialPardonForm pardon("Ford Prefect");
+        clerk.signForm(pardon);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 7: RobotomyRequestForm - grade too low to execute ===" << std::endl;
+    try {
+        Bureaucrat signer("Signer", 50);
+        Bureaucrat executor("Executor", 50);
+        RobotomyRequestForm robot("Target");
+        signer.signForm(robot);
+        executor.executeForm(robot);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    std::cout << "\n=== Test 8: Execute at exact grade limit ===" << std::endl;
+    try {
+        Bureaucrat exact("ExactGrade", 137);
+        Bureaucrat signer("Signer", 1);
+        ShrubberyCreationForm shrub("exact");
+        signer.signForm(shrub);
+        exact.executeForm(shrub);
+    }
+    catch (std::exception& e) {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    return 0;
 }
 ```
 
 ---
 
-## Exception Flow Visualization
+## Exercise 03: At least this beats coffee-making
 
-```
-main()
-  │
-  └─► try {
-        │
-        └─► Bureaucrat("Bob", 0)    ← Constructor called
-              │
-              └─► if (grade < 1)
-                    throw GradeTooHighException()  ← EXCEPTION THROWN!
-                    │
-                    │ Exception travels UP the call stack
-                    │
-                    ▼
-      } catch (std::exception& e) {  ← CAUGHT HERE
-          std::cout << e.what();     ← "Grade is too high!"
-      }
+### Goal
+Implement an `Intern` class that can create forms. Learn about **factory patterns** and avoiding messy if/else structures using **function pointers** or **lookup tables**.
+
+### New Concept: Factory Pattern
+
+A **factory** is a function or class that creates objects for you. Instead of:
+```cpp
+AForm* form;
+if (name == "shrubbery creation")
+    form = new ShrubberyCreationForm(target);
+else if (name == "robotomy request")
+    form = new RobotomyRequestForm(target);
+else if (name == "presidential pardon")
+    form = new PresidentialPardonForm(target);
 ```
 
----
+You use a factory:
+```cpp
+AForm* form = intern.makeForm("robotomy request", "Bender");
+```
 
-## Quick Reference
+**Why factories?**
+- Centralizes object creation logic
+- Caller doesn't need to know concrete class names
+- Easy to add new form types without changing calling code
 
-| Keyword | Purpose |
-|---------|---------|
-| `throw` | Throws an exception, stops current function |
-| `try` | Wraps code that might throw |
-| `catch` | Handles thrown exceptions |
-| `what()` | Returns exception description (override in custom exceptions) |
-| `throw()` | Exception specification (function promises not to throw) |
+### Requirements
 
----
+**Files to Submit:**
+- All files from ex02
+- `Intern.hpp`, `Intern.cpp`
 
-## Exercises Summary
+**Intern Class:**
+| Attribute | Description |
+|-----------|-------------|
+| None | Interns have no name, no grade, no unique characteristics |
 
-| Exercise | New Concept | Classes |
-|----------|-------------|---------|
-| ex00 | Basic exceptions | Bureaucrat |
-| ex01 | More exception practice | Form (signed by Bureaucrat) |
-| ex02 | Abstract classes + exceptions | AForm, ShrubberyCreationForm, RobotomyRequestForm, PresidentialPardonForm |
-| ex03 | Factory pattern + exceptions | Intern (creates forms) |
+| Method | Description |
+|--------|-------------|
+| `makeForm(std::string formName, std::string target)` | Creates and returns a pointer to the requested form |
 
----
+**makeForm() behavior:**
+- Takes form name and target as parameters
+- Returns `AForm*` pointing to the created form
+- Prints: `Intern creates <form>`
+- If form name doesn't exist: prints error message
 
-## Memory and Exception Safety
+**Valid form names:**
+| Input String | Creates |
+|--------------|---------|
+| `"shrubbery creation"` | `ShrubberyCreationForm` |
+| `"robotomy request"` | `RobotomyRequestForm` |
+| `"presidential pardon"` | `PresidentialPardonForm` |
 
-When an exception is thrown, C++ **unwinds the stack**:
-- Local variables in the try block are destroyed (destructors called)
-- This is called RAII (Resource Acquisition Is Initialization)
+### Key Concept: Avoiding if/else Chains
+
+The subject explicitly forbids messy if/else structures. A clean approach is to use a **loop + switch** pattern.
+
+**Note:** In C++98, `switch` only works with integers, not strings. So we first find the index of the form name, then use switch on that index.
+
+#### Loop + Switch Pattern (Recommended)
 
 ```cpp
-try {
-    Bureaucrat bob("Bob", 50);  // bob is created
-    throw SomeException();      // Exception thrown!
-    // ~Bureaucrat() is automatically called for bob
-}
-catch (...) {
-    // bob has already been destroyed
+AForm* Intern::makeForm(std::string formName, std::string target)
+{
+    // Array of valid form names
+    std::string formNames[] = {
+        "shrubbery creation",
+        "robotomy request",
+        "presidential pardon"
+    };
+    
+    // Find the index of the form name
+    int formIndex = -1;
+    for (int i = 0; i < 3; i++) {
+        if (formNames[i] == formName) {
+            formIndex = i;
+            break;
+        }
+    }
+    
+    // Use switch on the index
+    AForm* form = NULL;
+    switch (formIndex) {
+        case 0:
+            form = new ShrubberyCreationForm(target);
+            break;
+        case 1:
+            form = new RobotomyRequestForm(target);
+            break;
+        case 2:
+            form = new PresidentialPardonForm(target);
+            break;
+        default:
+            std::cout << "Error: Form '" << formName << "' does not exist" << std::endl;
+            return NULL;
+    }
+    
+    std::cout << "Intern creates " << formName << std::endl;
+    return form;
 }
 ```
 
-**Important:** If you have raw pointers, they won't be cleaned up automatically:
+**Why this works:**
+1. The loop finds which form was requested (returns an integer index)
+2. The switch creates the correct form based on that index
+3. Clean, readable, and avoids messy if/else chains
+
+### Implementation Guide
+
+**Intern.hpp:**
 ```cpp
-try {
-    Bureaucrat* bob = new Bureaucrat("Bob", 50);
-    throw SomeException();
-    delete bob;  // NEVER EXECUTED = MEMORY LEAK!
+#ifndef INTERN_HPP
+#define INTERN_HPP
+
+#include "AForm.hpp"
+
+class Intern {
+
+public:
+    // Orthodox Canonical Form
+    Intern(void);
+    ~Intern(void);
+    Intern(const Intern& other);
+    Intern& operator=(const Intern& other);
+
+    // The intern's only ability
+    AForm* makeForm(std::string formName, std::string target);
+
+};
+
+#endif /* INTERN_HPP */
+```
+
+**Intern.cpp:**
+```cpp
+#include "Intern.hpp"
+#include "ShrubberyCreationForm.hpp"
+#include "RobotomyRequestForm.hpp"
+#include "PresidentialPardonForm.hpp"
+
+/* ┌──────────────────┐ */
+/* │   CONSTRUCTORS   │ */
+/* └──────────────────┘ */
+Intern::Intern(void)
+{ }
+
+Intern::Intern(const Intern& other)
+{
+    (void)other;  // Nothing to copy
+}
+
+/* ┌───────────────────┐ */
+/* │   DESTRUCTOR     │ */
+/* └───────────────────┘ */
+Intern::~Intern(void)
+{ }
+
+/* ┌───────────────┐ */
+/* │   OVERLOADS   │ */
+/* └───────────────┘ */
+Intern& Intern::operator=(const Intern& other)
+{
+    (void)other;  // Nothing to assign
+    return *this;
+}
+
+/* ┌──────────────────────┐ */
+/* │   MEMBER FUNCTIONS   │ */
+/* └──────────────────────┘ */
+AForm* Intern::makeForm(std::string formName, std::string target)
+{
+    // Array of valid form names
+    std::string formNames[] = {
+        "shrubbery creation",
+        "robotomy request",
+        "presidential pardon"
+    };
+    
+    // Find the index of the form name
+    int formIndex = -1;
+    for (int i = 0; i < 3; i++) {
+        if (formNames[i] == formName) {
+            formIndex = i;
+            break;
+        }
+    }
+    
+    // Use switch on the index
+    AForm* form = NULL;
+    switch (formIndex) {
+        case 0:
+            form = new ShrubberyCreationForm(target);
+            break;
+        case 1:
+            form = new RobotomyRequestForm(target);
+            break;
+        case 2:
+            form = new PresidentialPardonForm(target);
+            break;
+        default:
+            std::cout << "Error: Intern cannot create form '" << formName 
+                      << "' - form does not exist" << std::endl;
+            return NULL;
+    }
+    
+    std::cout << "Intern creates " << formName << std::endl;
+    return form;
 }
 ```
 
-Solution: Use RAII (smart pointers) or ensure cleanup in catch:
+### Testing Example (main.cpp)
+
 ```cpp
-try {
-    Bureaucrat* bob = new Bureaucrat("Bob", 50);
-    throw SomeException();
-}
-catch (...) {
-    // Can't access bob here! It's out of scope!
+#include "Bureaucrat.hpp"
+#include "Intern.hpp"
+#include "ShrubberyCreationForm.hpp"
+#include "RobotomyRequestForm.hpp"
+#include "PresidentialPardonForm.hpp"
+#include <cstdlib>
+#include <ctime>
+
+int main()
+{
+    std::srand(std::time(0));
+    
+    Intern someRandomIntern;
+    Bureaucrat boss("Boss", 1);
+    
+    std::cout << "=== Test 1: Intern creates RobotomyRequestForm ===" << std::endl;
+    {
+        AForm* rrf = someRandomIntern.makeForm("robotomy request", "Bender");
+        if (rrf) {
+            std::cout << *rrf << std::endl;
+            boss.signForm(*rrf);
+            boss.executeForm(*rrf);
+            delete rrf;
+        }
+    }
+    
+    std::cout << "\n=== Test 2: Intern creates ShrubberyCreationForm ===" << std::endl;
+    {
+        AForm* scf = someRandomIntern.makeForm("shrubbery creation", "garden");
+        if (scf) {
+            boss.signForm(*scf);
+            boss.executeForm(*scf);
+            delete scf;
+        }
+    }
+    
+    std::cout << "\n=== Test 3: Intern creates PresidentialPardonForm ===" << std::endl;
+    {
+        AForm* ppf = someRandomIntern.makeForm("presidential pardon", "Marvin");
+        if (ppf) {
+            boss.signForm(*ppf);
+            boss.executeForm(*ppf);
+            delete ppf;
+        }
+    }
+    
+    std::cout << "\n=== Test 4: Intern tries to create invalid form ===" << std::endl;
+    {
+        AForm* invalid = someRandomIntern.makeForm("coffee request", "Office");
+        if (!invalid) {
+            std::cout << "Form creation failed as expected" << std::endl;
+        }
+    }
+    
+    return 0;
 }
 ```
+
+### Important Notes
+
+1. **Memory Management**: `makeForm()` returns a pointer to `new`'d memory. The caller is responsible for `delete`ing it!
+
+2. **Return NULL on failure**: If the form name doesn't exist, return `NULL` (not throw an exception, unless you prefer that approach).
+
+3. **Case sensitivity**: Form names should match exactly. You could add case-insensitive comparison if you want.
 
 ---
 
-## Compilation
+## Summary
 
-Make sure your Makefile includes:
-```makefile
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
-```
+| Exercise | Key Concepts |
+|----------|--------------|
+| ex00 | Basic exceptions, nested exception classes, throw/try/catch |
+| ex01 | Class interaction, forward declarations, one class throws another catches |
+| ex02 | Abstract classes, pure virtual functions, polymorphism |
+| ex03 | Factory pattern, loop + switch for string matching |
 
-Good luck with your exceptions! 🎯
+**Remember:**
+- Grade 1 = HIGHEST (best), Grade 150 = LOWEST (worst)
+- Exceptions use `what()` to return error messages
+- Nested classes keep exceptions organized
+- Forward declarations prevent circular includes
+- Pure virtual functions (`= 0`) make classes abstract
+- Switch doesn't work with strings in C++98 - use loop to find index first
+- Factory pattern centralizes object creation
