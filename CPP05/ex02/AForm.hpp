@@ -24,27 +24,21 @@ public:
 	void setIsSigned(const bool a);
 
 	void beSigned(const Bureaucrat& b);
-	void virtual execute(const Bureaucrat& executor) const = 0;
+	virtual void execute(const Bureaucrat& executor) const = 0;
 
 	class GradeTooHighException : public std::exception {
     public:
-        const char* what() const throw() {
-            return "AForm: Grade is too high (minimum is 1)";
-        }
+        const char* what() const throw();
     };
     
     class GradeTooLowException : public std::exception {
     public:
-        const char* what() const throw() {
-            return "AForm: Grade is too low (maximum is 150)";
-        }
+        const char* what() const throw();
     };
 
 	class FormNotSignedException : public std::exception {
     public:
-        const char* what() const throw() {
-            return "Aform: Form is not signed!";
-        }
+        const char* what() const throw();
     };
 
 private:

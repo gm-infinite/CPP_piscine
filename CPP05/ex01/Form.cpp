@@ -55,11 +55,12 @@ Form& Form::operator=(const Form& other)
 
 void Form::beSigned(const Bureaucrat& b)
 {
-    if (this->IsSigned)
-    	throw std::runtime_error("Form is already signed");
-	if (!(b.getGrade() <= this->SignGrade))
+	if (this->IsSigned) {
+		throw std::runtime_error("Form is already signed");
+	}
+	if (!(b.getGrade() <= this->SignGrade)) {
 		throw Form::GradeTooLowException();
-	std::cout << "the form has been signed" << std::endl;
+	}
 	this->IsSigned = true;
 }
 
@@ -77,6 +78,14 @@ int Form::getSignGrade(void) const {
 
 int Form::getExecuteGrade(void) const {
 	return this->ExecuteGrade;
+}
+
+const char* Form::GradeTooHighException::what() const throw() {
+	return "Form: Grade is too high (minimum is 1)";
+}
+
+const char* Form::GradeTooLowException::what() const throw() {
+	return "Form: Grade is too low (maximum is 150)";
 }
 
 std::ostream& operator<<(std::ostream& os, const Form& f)

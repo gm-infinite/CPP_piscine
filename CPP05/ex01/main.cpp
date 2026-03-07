@@ -66,5 +66,19 @@ int main()
 		std::cout << e.what() << std::endl;
 	}
 
+	std::cout << "\n--- Test 7: Bureaucrat tries to sign twice ---" << std::endl;
+	try {
+		Bureaucrat exactGrade("ExactGrade", 50);
+		Form exactForm("Exact Form", 50, 25);
+		std::cout << exactGrade << std::endl;
+		std::cout << exactForm << std::endl;
+		exactGrade.signForm(exactForm);
+		std::cout << exactForm << std::endl;
+		exactGrade.signForm(exactForm);
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
+
 	return 0;
 }
