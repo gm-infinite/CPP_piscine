@@ -2,7 +2,7 @@
 #include "ScalarConverter.hpp"
 #include <cstdlib>   // atoi, strtol, strtod, strtof, rand
 #include <climits>   // INT_MIN, INT_MAX
-#include <cfloat>    // FLT_MIN, FLT_MAX
+#include <cfloat>    //     FLT_MIN, FLT_MAX
 #include <cmath>     // isnan, isinf
 #include <cctype>    // isprint, isdigit
 #include <iostream>
