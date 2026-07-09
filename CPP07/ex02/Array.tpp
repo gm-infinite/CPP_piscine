@@ -25,11 +25,12 @@ Array<T>& Array<T>::operator=(const Array& other)
 {
 	if (this != &other)
 	{
-		delete[] this->_array;
-		this->_size = other._size;
-		this->_array = new T[other._size]();
+		T* newArray = new T[other._size]();
 		for (unsigned int i = 0; i < other._size; ++i)
-			(*this)[i] = other[i];
+			newArray[i] = other[i];
+		delete[] this->_array;
+		this->_array = newArray;
+		this->_size = other._size;
 	}
 	return *this;
 }

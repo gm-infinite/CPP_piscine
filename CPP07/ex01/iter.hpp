@@ -4,9 +4,9 @@
 
 
 template <typename T, typename F>
-void iter(T* addr, const int size, F func)
+void iter(T* addr, const unsigned int size, F func)
 {
-	for (int i = 0; i < size; i++)
+	for (unsigned int i = 0; i < size; i++)
 	{
 		func(addr[i]);
 	}
