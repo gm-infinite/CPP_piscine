@@ -53,9 +53,6 @@ int Span::shortestSpan(void) const
         throw std::logic_error("Logic_error: Span::shortestSpan: array is empty");
     if (this->array.size() <= 1)
         throw std::logic_error("Logic_error: Span::shortestSpan: does not have enough numbers");
-    std::vector<int> temp(this->array);
-    std::sort(temp.begin(), temp.end());
-    
 	std::vector<int> sorted(this->array);
     std::sort(sorted.begin(), sorted.end());
 
