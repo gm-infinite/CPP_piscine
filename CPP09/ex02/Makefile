@@ -1,6 +1,6 @@
-CPP_FILES = main.cpp
+CPP_FILES = main.cpp PmergeMe.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = test
+NAME = PmergeMe
 all: $(NAME)
 
 $(NAME):
