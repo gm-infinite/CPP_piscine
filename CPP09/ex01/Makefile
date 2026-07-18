@@ -1,6 +1,6 @@
 CPP_FILES = main.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
-NAME = test
+NAME = RPN
 all: $(NAME)
 
 $(NAME):

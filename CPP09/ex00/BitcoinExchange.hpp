@@ -12,7 +12,6 @@
 class BitcoinExchange {
 
 public:
-    BitcoinExchange(void);
     ~BitcoinExchange(void);
     BitcoinExchange(const BitcoinExchange& other);
     BitcoinExchange& operator=(const BitcoinExchange& other);
@@ -22,6 +21,8 @@ public:
 
 private:
     std::map<std::string, float> _data;
+
+    BitcoinExchange(void);
 };
 
 #endif /* BITCOINEXCHANGE_HPP */
