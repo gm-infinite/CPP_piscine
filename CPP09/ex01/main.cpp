@@ -5,11 +5,18 @@ int main (int ac, char** av)
 {
 	if (ac != 2)
 	{
-		std::cerr << "Error: invalid arguments. Usage: ./RPN <expression>" << std::endl;
+		std::cerr << "Error" << std::endl;
 		return 1;
 	}
-	if(!input_validator(av[1]))
+	try
+	{
+		RPN rpn(av[1]);
+		std::cout << rpn.getResult() << std::endl;
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
 		return 1;
-	std::cout << RPN_calculator(av[1]) << std::endl;
+	}
 	return 0;
 }

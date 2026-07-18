@@ -1,13 +1,28 @@
 
 #ifndef RPN_HPP
-#define RPN_HPP
+# define RPN_HPP
 
 #include <iostream>
 #include <stack>
 #include <string>
-#include <algorithm>
+#include <sstream>
+#include <stdexcept>
 
-bool input_validator(std::string argument);
-int RPN_calculator(std::string argument);
+class RPN {
+
+public:
+    ~RPN(void);
+    RPN(const RPN& other);
+    RPN& operator=(const RPN& other);
+
+    RPN(const std::string& expression);
+    int getResult(void) const;
+
+private:
+    std::stack<int> _stack;
+    int             _result;
+
+    RPN(void);
+};
 
 #endif /* RPN_HPP */

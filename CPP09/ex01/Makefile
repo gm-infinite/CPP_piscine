@@ -1,4 +1,4 @@
-CPP_FILES = main.cpp
+CPP_FILES = main.cpp RPN.cpp
 FLAGS = -std=c++98 -Wall -Wextra -Werror
 NAME = RPN
 all: $(NAME)

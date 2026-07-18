@@ -1,66 +1,84 @@
 
 #include "RPN.hpp"
 
-bool input_validator(std::string argument)
+/* ┌──────────────────┐ */
+/* │   CONSTRUCTORS   │ */
+/* └──────────────────┘ */
+RPN::RPN(void) : _stack(), _result(0)
+{ }
+
+RPN::RPN(const std::string& expression) : _stack(), _result(0)
 {
-	int number_count = 0;
-	int operation_count = 0;
-	for(int i = 0; i < argument.length(); i++)
+	std::istringstream iss(expression);
+	std::string token;
+
+	while (iss >> token)
 	{
-		if((argument[i] >= '0' && argument[i] <= '9') || argument[i] == ' ')
+		if (token.size() == 1 && (token[0] == '+' || token[0] == '-'
+			|| token[0] == '*' || token[0] == '/'))
 		{
-			number_count++;
-			continue;
+			if (this->_stack.size() < 2)
+				throw std::runtime_error("Error");
+			int a = this->_stack.top();
+			this->_stack.pop();
+			int b = this->_stack.top();
+			this->_stack.pop();
+			if (token[0] == '+')
+				this->_stack.push(b + a);
+			else if (token[0] == '-')
+				this->_stack.push(b - a);
+			else if (token[0] == '*')
+				this->_stack.push(b * a);
+			else if (token[0] == '/')
+			{
+				if (a == 0)
+					throw std::runtime_error("Error");
+				this->_stack.push(b / a);
+			}
 		}
-		else if(argument[i] == '+' || argument[i] == '-' || argument[i] == '*' || argument[i] == '/')
+		else if (token.size() == 1 && token[0] >= '0' && token[0] <= '9')
 		{
-			operation_count++;
-			continue; 
+			this->_stack.push(token[0] - '0');
 		}
 		else
 		{
-			std::cerr << "Error: invalid characters in expression." << std::endl;
-			return (false);
+			throw std::runtime_error("Error");
 		}
 	}
-	if(number_count != operation_count + 1)
-	{
-		std::cerr << "Error: invalid number of operands or operators." << std::endl;
-		return (false);
-	}
-	return (true);
+	if (this->_stack.size() != 1)
+		throw std::runtime_error("Error");
+	this->_result = this->_stack.top();
 }
 
-int RPN_calculator(std::string argument)
-{
-	std::stack<int> stack;
-	for(int i = 0; i < argument.length(); i++)
-	{
-		if(argument[i] >= '0' && argument[i] <= '9')
-			stack.push(argument[i] - '0');
-		else if(argument[i] == '+' || argument[i] == '-' || argument[i] == '*' || argument[i] == '/')
-		{
-			int a = stack.top();
-			stack.pop();
-			int b = stack.top();
-			stack.pop();
-			stack.push(calculate(a, b, argument[i]));
-		}
-	}
+RPN::RPN(const RPN& other) : _stack(other._stack), _result(other._result)
+{ }
 
-	return (stack.top());
+/* ┌───────────────────┐ */
+/* │   DESTRUCTOR      │ */
+/* └───────────────────┘ */
+
+RPN::~RPN(void)
+{ }
+
+/* ┌───────────────┐ */
+/* │   OVERLOADS   │ */
+/* └───────────────┘ */
+
+RPN& RPN::operator=(const RPN& other)
+{
+	if (this != &other)
+	{
+		this->_stack = other._stack;
+		this->_result = other._result;
+	}
+	return *this;
 }
 
-int calculate(int a, int b, char op)
+/* ┌──────────────────────┐ */
+/* │   MEMBER FUNCTIONS   │ */
+/* └──────────────────────┘ */
+
+int RPN::getResult(void) const
 {
-	if(op == '+')
-		return (a + b);
-	else if(op == '-')
-		return (a - b);
-	else if(op == '*')
-		return (a * b);
-	else if(op == '/')
-		return (a / b);
-	else
-		return (0);
+	return (this->_result);
 }
